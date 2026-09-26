@@ -1,0 +1,52 @@
+{
+  "name": "dsh-token-usage",
+  "version": "1.0.0",
+  "description": "DSH 插件：在「设置」里新增 Token 用量页，展示全局总用量、GitHub 风格用量日历，以及按供应商分组的逐模型用量（今日 / 近 7 日 / 近 30 日）。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "deepseek-harness",
+    "harness",
+    "cordis",
+    "token",
+    "usage",
+    "statistics",
+    "heatmap"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "install:profile": "node tools/install-into-profile.mjs",
+    "install:profile:dry": "node tools/install-into-profile.mjs --dry-run",
+    "uninstall:profile": "node tools/install-into-profile.mjs --uninstall"
+  }
+}
