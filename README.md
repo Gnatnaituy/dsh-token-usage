@@ -12,7 +12,7 @@ DeepSeek Harness 的 Token 用量统计插件：在「设置」里新增一个 *
 
 ## 安装
 
-本机开发安装（软链 + 热挂载，无需重启 DSH Desktop）：
+本机开发安装（软链 + 热挂载，无需重启）：
 
 ```sh
 node tools/install-into-profile.mjs            # 安装
@@ -23,17 +23,28 @@ node tools/install-into-profile.mjs --uninstall
 脚本会做三件事（幂等）：
 
 1. 把本仓库软链进 profile 的 `node_modules/dsh-token-usage`；
-2. 在 profile 的 `package.json` 里登记 `link:` 依赖；
-3. 在 profile 的 `cordis.patch.yml` 里插入一行 Loader 条目
-   （`id: token-usage` / `name: dsh-token-usage`），由 DSH 的配置 HMR 热挂载。
+2. 在 profile 的 `package.json` 里登记 `link:` 依赖，并把包加进 `dsh.profile.bundles`
+   （排在 `@deepseek-ai/dsh-web-app` 之后）；
+3. 清扫旧版本脚本可能留在 profile `cordis.patch.yml` 里的手写 `token-usage` 行。
 
 装完等一两秒，刷新浏览器页面，打开 **设置 → Token 用量** 即可。
 
-### 通过 bundle 安装（发布/市场场景）
+### 为什么是 bundle 挂载
 
-本包自带 `cordis.patch.yml`（`dsh.bundle.patch`）。把包加入 profile 的
-`dsh.profile.bundles` 也可以，但**不要同时**既加 bundle 又把行写进 `cordis.patch.yml`：
-两处会 insert 同一条目 id，Loader 会报 `duplicate loader entry id`。二选一即可。
+要挂的那一行由包自己的 `cordis.patch.yml` 声明（`package.json` 的 `dsh.bundle.patch`
+指向它），装进 `dsh.profile.bundles` 就完事；再往 profile 的 `cordis.patch.yml` 里手写
+一行 `insert`，会是同一个 entry id 的第二次挂载，Loader 会报 `duplicate loader entry id`。
+`dsh-sidebar-browser` 与 `dsh-sidebar-chat` 都是这个放法，三个插件一致。
+
+profile 的 `bundles` 列表与 `cordis.patch.yml` 都会被热重载。
+
+想临时停用而不卸载，在 profile 的 `cordis.patch.yml` 里加一条（脚本的安装路径不会动它）：
+
+```yaml
+- id: token-usage
+  name: dsh-token-usage
+  disabled: true
+```
 
 ## 数据存放
 
